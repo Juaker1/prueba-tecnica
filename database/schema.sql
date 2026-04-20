@@ -58,4 +58,3 @@ CREATE INDEX idx_solicitudes_estado ON solicitudes (estado);
 CREATE INDEX idx_solicitudes_tipo   ON solicitudes (tipo);
 CREATE INDEX idx_solicitudes_correo ON solicitudes (correo);
 
--- Los datos iniciales se insertan ejecutando: database/seed.php

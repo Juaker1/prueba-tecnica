@@ -19,6 +19,9 @@ session_start();
 
 require_once __DIR__ . '/config/database.php';
 
+// URL base para referenciar assets desde las vistas
+define('BASE_URL', '/prueba-tecnica/');
+
 // --- Resolución del controlador y acción ---
 $controllerName = $_GET['controller'] ?? 'auth';
 $actionName     = $_GET['action']     ?? 'login';
