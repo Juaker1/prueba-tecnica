@@ -18,6 +18,7 @@ declare(strict_types=1);
 session_start();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
 
 // URL base para referenciar assets desde las vistas
 define('BASE_URL', '/prueba-tecnica/');
