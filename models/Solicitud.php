@@ -113,6 +113,37 @@ class Solicitud
     }
 
     /**
+     * Busca una solicitud por su ID.
+     * Retorna el array completo o false si no existe.
+     */
+    public function findById(int $id): array|false
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT s.*, u.nombre AS nombre_usuario
+             FROM solicitudes s
+             INNER JOIN usuarios u ON u.id = s.usuario_id
+             WHERE s.id = ?
+             LIMIT 1'
+        );
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    /**
+     * Actualiza el estado y el comentario opcional de una solicitud.
+     * Solo el administrador puede llamar a este método.
+     */
+    public function updateEstado(int $id, string $estado, ?string $comentario): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE solicitudes
+             SET estado = ?, comentario = ?
+             WHERE id = ?'
+        );
+        return $stmt->execute([$estado, $comentario, $id]);
+    }
+
+    /**
      * Inserta una nueva solicitud en la base de datos.
      * Retorna el ID generado.
      *

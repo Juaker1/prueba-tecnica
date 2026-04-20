@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS solicitudes (
                             'aprobada',
                             'rechazada'
                         )            NOT NULL DEFAULT 'pendiente',
+    comentario          TEXT             NULL,
     created_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
                                      ON UPDATE CURRENT_TIMESTAMP,
