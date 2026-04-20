@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/assets/css/custom.css">
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
 
 <?php if (isset($_SESSION['user_id'])): ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -28,21 +28,6 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php?controller=solicitud&action=index">
-                        <i class="bi bi-list-ul me-1"></i>Listado
-                    </a>
-                </li>
-                <?php if ($_SESSION['user_rol'] === 'usuario'): ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php?controller=solicitud&action=create">
-                        <i class="bi bi-plus-circle me-1"></i>Nueva solicitud
-                    </a>
-                </li>
-                <?php endif; ?>
-            </ul>
-
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item me-3">
                     <span class="navbar-text text-white-50">
@@ -64,7 +49,7 @@
 </nav>
 <?php endif; ?>
 
-<main class="container py-4">
+<main class="container py-4 flex-grow-1">
 
 <?php if (!empty($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
