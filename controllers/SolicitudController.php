@@ -8,7 +8,7 @@ require_once __DIR__ . '/../models/Solicitud.php';
  * Controlador de solicitudes.
  *
  * Acciones disponibles:
- *   - index()  → Lista solicitudes (se desarrolla en commit #5).
+ *   - index()  → Lista solicitudes con filtros, diferenciada por rol.
  *   - create() → Muestra el formulario de nueva solicitud (solo rol usuario).
  *   - store()  → Procesa el POST del formulario y guarda en BD (solo rol usuario).
  */
@@ -22,12 +22,26 @@ class SolicitudController
     }
 
     /**
-     * Lista de solicitudes.
-     * Placeholder — se implementa completamente en el commit #5.
+     * Lista solicitudes con filtros opcionales y estadísticas por rol.
+     * Admin ve todas; usuario ve solo las suyas.
      */
     public function index(): void
     {
         requireLogin();
+
+        $esAdmin    = $_SESSION['user_rol'] === 'admin';
+        $usuarioId  = $esAdmin ? null : (int) $_SESSION['user_id'];
+
+        // Extraer y sanear filtros desde GET
+        $filtros = [
+            'estado'   => $_GET['estado']   ?? '',
+            'tipo'     => $_GET['tipo']      ?? '',
+            'busqueda' => trim($_GET['busqueda'] ?? ''),
+        ];
+
+        $solicitudes = $this->solicitudModel->getAll($filtros, $usuarioId);
+        $stats       = $this->solicitudModel->getStats($usuarioId);
+
         require_once __DIR__ . '/../views/solicitudes/index.php';
     }
 

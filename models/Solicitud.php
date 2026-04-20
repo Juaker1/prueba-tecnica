@@ -34,6 +34,85 @@ class Solicitud
     }
 
     /**
+     * Retorna solicitudes aplicando filtros opcionales.
+     *
+     * Si se pasa $usuarioId, restringe los resultados a ese usuario (rol usuario).
+     * Si es null, trae todas (rol admin).
+     *
+     * @param array{estado?: string, tipo?: string, busqueda?: string} $filtros
+     */
+    public function getAll(array $filtros = [], ?int $usuarioId = null): array
+    {
+        $conditions = [];
+        $params     = [];
+
+        if ($usuarioId !== null) {
+            $conditions[] = 'usuario_id = ?';
+            $params[]     = $usuarioId;
+        }
+
+        if (!empty($filtros['estado']) && array_key_exists($filtros['estado'], self::ESTADOS)) {
+            $conditions[] = 'estado = ?';
+            $params[]     = $filtros['estado'];
+        }
+
+        if (!empty($filtros['tipo']) && array_key_exists($filtros['tipo'], self::TIPOS)) {
+            $conditions[] = 'tipo = ?';
+            $params[]     = $filtros['tipo'];
+        }
+
+        if (!empty($filtros['busqueda'])) {
+            $conditions[] = '(nombre_solicitante LIKE ? OR correo LIKE ?)';
+            $termino      = '%' . $filtros['busqueda'] . '%';
+            $params[]     = $termino;
+            $params[]     = $termino;
+        }
+
+        $sql = 'SELECT id, nombre_solicitante, correo, tipo, estado, created_at
+                FROM solicitudes';
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql .= ' ORDER BY created_at DESC';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Retorna conteos de solicitudes agrupados por estado.
+     * Si se pasa $usuarioId, limita las estadísticas a ese usuario.
+     *
+     * @return array<string, int>  ['pendiente' => 3, 'aprobada' => 1, ...]
+     */
+    public function getStats(?int $usuarioId = null): array
+    {
+        $stats = array_fill_keys(array_keys(self::ESTADOS), 0);
+
+        $sql    = 'SELECT estado, COUNT(*) AS total FROM solicitudes';
+        $params = [];
+
+        if ($usuarioId !== null) {
+            $sql   .= ' WHERE usuario_id = ?';
+            $params[] = $usuarioId;
+        }
+
+        $sql .= ' GROUP BY estado';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        foreach ($stmt->fetchAll() as $row) {
+            $stats[$row['estado']] = (int) $row['total'];
+        }
+
+        return $stats;
+    }
+
+    /**
      * Inserta una nueva solicitud en la base de datos.
      * Retorna el ID generado.
      *
