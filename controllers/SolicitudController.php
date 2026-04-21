@@ -35,10 +35,11 @@ class SolicitudController
         $usuarioId  = $esAdmin ? null : (int) $_SESSION['user_id'];
 
         // Extraer y sanear filtros desde GET
+        // La búsqueda por texto solo aplica al admin (el usuario solo ve sus propias solicitudes)
         $filtros = [
             'estado'   => $_GET['estado']   ?? '',
             'tipo'     => $_GET['tipo']      ?? '',
-            'busqueda' => trim($_GET['busqueda'] ?? ''),
+            'busqueda' => $esAdmin ? trim($_GET['busqueda'] ?? '') : '',
         ];
 
         $solicitudes = $this->solicitudModel->getAll($filtros, $usuarioId);
