@@ -8,9 +8,11 @@ require_once __DIR__ . '/../models/Solicitud.php';
  * Controlador de solicitudes.
  *
  * Acciones disponibles:
- *   - index()  → Lista solicitudes con filtros, diferenciada por rol.
- *   - create() → Muestra el formulario de nueva solicitud (solo rol usuario).
- *   - store()  → Procesa el POST del formulario y guarda en BD (solo rol usuario).
+ *   - index()        → Lista solicitudes con filtros, diferenciada por rol.
+ *   - detail()       → Muestra el detalle de una solicitud (admin ve todas; usuario solo las propias).
+ *   - updateEstado() → Actualiza estado y comentario de una solicitud (solo admin).
+ *   - create()       → Muestra el formulario de nueva solicitud (solo rol usuario).
+ *   - store()        → Procesa el POST del formulario y guarda en BD (solo rol usuario).
  */
 class SolicitudController
 {
