@@ -8,9 +8,9 @@
     if (!form || !btnLimpiar) return;
 
     function actualizarBotonLimpiar() {
-        const busqueda = document.getElementById('busqueda')?.value.trim() ?? '';
-        const estado   = document.getElementById('estado')?.value           ?? '';
-        const tipo     = document.getElementById('tipo')?.value             ?? '';
+        const busqueda = form.querySelector('[name="busqueda"]')?.value.trim() ?? '';
+        const estado   = form.querySelector('[name="estado"]')?.value           ?? '';
+        const tipo     = form.querySelector('[name="tipo"]')?.value             ?? '';
 
         const hayFiltros = busqueda !== '' || estado !== '' || tipo !== '';
 
@@ -130,4 +130,64 @@
             e.preventDefault();
         }
     });
+}());
+
+// ── Filtrado en tiempo real del listado ──────────────────────────────────────
+
+(function () {
+    const form          = document.getElementById('filtroForm');
+    const tbody         = document.querySelector('#tablaListado tbody');
+    const sinResultados = document.getElementById('sinResultados');
+    const tablaCard     = document.getElementById('tablaCard');
+    const contador      = document.getElementById('contadorResultados');
+
+    if (!form || !tbody) return;
+
+    const inputBusqueda = form.querySelector('[name="busqueda"]');
+    const selectEstado  = form.querySelector('[name="estado"]');
+    const selectTipo    = form.querySelector('[name="tipo"]');
+
+    let debounceTimer = null;
+
+    function aplicarFiltros() {
+        const busqueda = inputBusqueda ? inputBusqueda.value.trim().toLowerCase() : '';
+        const estado   = selectEstado  ? selectEstado.value  : '';
+        const tipo     = selectTipo    ? selectTipo.value    : '';
+
+        let visibles = 0;
+
+        tbody.querySelectorAll('tr').forEach(function (fila) {
+            const coincideBusqueda = !busqueda ||
+                fila.dataset.nombre.includes(busqueda) ||
+                (fila.dataset.correo && fila.dataset.correo.includes(busqueda));
+
+            const coincideEstado = !estado || fila.dataset.estado === estado;
+            const coincideTipo   = !tipo   || fila.dataset.tipo   === tipo;
+
+            const mostrar = coincideBusqueda && coincideEstado && coincideTipo;
+            fila.style.display = mostrar ? '' : 'none';
+            if (mostrar) visibles++;
+        });
+
+        const sinDatos = visibles === 0;
+
+        if (sinResultados) sinResultados.style.display = sinDatos ? ''     : 'none';
+        if (tablaCard)     tablaCard.style.display     = sinDatos ? 'none' : '';
+        if (contador)      contador.style.display      = sinDatos ? 'none' : '';
+    }
+
+    if (selectEstado) {
+        selectEstado.addEventListener('change', aplicarFiltros);
+    }
+
+    if (selectTipo) {
+        selectTipo.addEventListener('change', aplicarFiltros);
+    }
+
+    if (inputBusqueda) {
+        inputBusqueda.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(aplicarFiltros, 300);
+        });
+    }
 }());

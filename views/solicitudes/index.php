@@ -68,6 +68,7 @@ $badgeEstado = [
             <input type="hidden" name="controller" value="solicitud">
             <input type="hidden" name="action" value="index">
 
+            <?php if ($esAdmin): ?>
             <div class="col-12 col-md-4">
                 <label class="form-label small fw-semibold mb-1">Buscar</label>
                 <input
@@ -78,8 +79,9 @@ $badgeEstado = [
                     value="<?= htmlspecialchars($filtros['busqueda']) ?>"
                 >
             </div>
+            <?php endif; ?>
 
-            <div class="col-6 col-md-3">
+            <div class="<?= $esAdmin ? 'col-6 col-md-3' : 'col-6 col-md-5' ?>">
                 <label class="form-label small fw-semibold mb-1">Estado</label>
                 <select name="estado" class="form-select form-select-sm">
                     <option value="">Todos</option>
@@ -91,7 +93,7 @@ $badgeEstado = [
                 </select>
             </div>
 
-            <div class="col-6 col-md-3">
+            <div class="<?= $esAdmin ? 'col-6 col-md-3' : 'col-6 col-md-5' ?>">
                 <label class="form-label small fw-semibold mb-1">Tipo</label>
                 <select name="tipo" class="form-select form-select-sm">
                     <option value="">Todos</option>
@@ -103,10 +105,7 @@ $badgeEstado = [
                 </select>
             </div>
 
-            <div class="col-12 col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-sm w-100">
-                    <i class="bi bi-search me-1"></i>Filtrar
-                </button>
+            <div class="col-auto d-flex align-items-end">
                 <a
                     id="btnLimpiar"
                     href="index.php?controller=solicitud&action=index"
@@ -122,15 +121,16 @@ $badgeEstado = [
 </div>
 
 <!-- ── TABLA DE SOLICITUDES ──────────────────────────────── -->
-<?php if (empty($solicitudes)): ?>
-    <div class="text-center text-muted py-5">
-        <i class="bi bi-inbox display-4 d-block mb-3"></i>
-        No se encontraron solicitudes<?= (!empty($filtros['busqueda']) || !empty($filtros['estado']) || !empty($filtros['tipo'])) ? ' con los filtros aplicados' : '' ?>.
-    </div>
-<?php else: ?>
-<div class="card shadow-sm">
+<!-- Mensaje sin resultados: visible si PHP no tiene datos, o si JS filtra todo -->
+<div class="text-center text-muted py-5" id="sinResultados" <?= !empty($solicitudes) ? 'style="display:none"' : '' ?>>
+    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+    No se encontraron solicitudes<?= $hayFiltros ? ' con los filtros aplicados' : '' ?>.
+</div>
+
+<?php if (!empty($solicitudes)): ?>
+<div class="card shadow-sm" id="tablaCard">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0" id="tablaListado">
             <thead class="table-light">
                 <tr>
                     <th class="ps-3">#</th>
@@ -146,7 +146,12 @@ $badgeEstado = [
             </thead>
             <tbody>
                 <?php foreach ($solicitudes as $s): ?>
-                <tr>
+                <tr
+                    data-nombre="<?= htmlspecialchars(mb_strtolower($s['nombre_solicitante'])) ?>"
+                    data-correo="<?= htmlspecialchars(mb_strtolower($s['correo'])) ?>"
+                    data-estado="<?= htmlspecialchars($s['estado']) ?>"
+                    data-tipo="<?= htmlspecialchars($s['tipo']) ?>"
+                >
                     <td class="ps-3 text-muted small"><?= $s['id'] ?></td>
                     <td class="fw-semibold"><?= htmlspecialchars($s['nombre_solicitante']) ?></td>
                     <?php if ($esAdmin): ?>
@@ -176,7 +181,7 @@ $badgeEstado = [
     </div>
 </div>
 
-<div class="text-muted small mt-2 text-end">
+<div class="text-muted small mt-2 text-end" id="contadorResultados">
     <?= count($solicitudes) ?> resultado<?= count($solicitudes) !== 1 ? 's' : '' ?>
 </div>
 <?php endif; ?>
